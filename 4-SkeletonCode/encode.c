@@ -117,19 +117,24 @@ Status check_capacity(EncodeInfo *encInfo)
 
     // Get the size of the source image
     uint image_capacity = get_image_size_for_bmp(encInfo->fptr_src_image);
+
+    // Get the size of the secret file in bytes
     uint size_secret_file = get_file_size(encInfo->fptr_secret);
-    uint magic_string_length=strlen(MAGIC_STRING);
-   // encInfo.secret_fname = argv[3];
-    char*file_extension=strchr(encInfo->secret_fname,'.');
-    if(file_extension!=NULL)
+
+    // Get the length of the magic string in bytes
+    uint magic_string_length = strlen(MAGIC_STRING);
+
+    // Get the secret file extension
+    char *file_extension = strchr(encInfo->secret_fname, '.');
+    uint extension_size = 0;
+    if (file_extension != NULL)
     {
-        uint extension_size=strlen(file_extension);
-        //printf("File Extension is :%s\n",file_extension);
-        //printf("File Extension length is :%u\n",extension_size);
+        uint extension_size = strlen(file_extension);
+        // printf("File Extension is :%s\n",file_extension);
+        // printf("File Extension length is :%u\n",extension_size);
     }
     else
     {
         printf("The file has no extension\n");
     }
-
 }
