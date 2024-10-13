@@ -131,7 +131,7 @@ Status check_capacity(EncodeInfo *encInfo)
     // Include BMP header size in calculations
     unsigned int header_size = 54;
     // Calculate total size correctly
-    unsigned int total_size = header_size + ((magic_string_length + extension_size + size_secret_file) * 8);
+    unsigned int total_size = header_size + ((magic_string_length + extension_size + size_secret_file+sizeof(size_secret_file)) * 8);
     if (image_capacity >= total_size)
     {
         printf("Sufficient capacity to encode the secret data.\n");
@@ -142,4 +142,61 @@ Status check_capacity(EncodeInfo *encInfo)
         printf("ERROR: Insufficient capacity in the image to encode the secret data.\n");
         return e_failure;
     }
+}
+Status copy_bmp_header(FILE *fptr_src_image, FILE *fptr_dest_image)
+{
+    char buffer[100];
+    rewind(fptr_src_image);
+    rewind(fptr_dest_image);
+
+    if (fread(buffer, 54, 1, fptr_src_image) != 1)
+    {
+        printf("ERROR: Unable to read the BMP header from the source image.\n");
+        return e_failure;
+    }
+
+    if (fwrite(buffer, 54, 1, fptr_dest_image) != 1)
+    {
+        printf("ERROR: Unable to write the BMP header from the destination image.\n");
+        return e_failure;
+    }
+
+    return e_success;
+}
+Status encode_magic_string(const char *magic_string, EncodeInfo *encInfo)
+{
+
+    FILE *src_file = encInfo->fptr_src_image;
+    FILE *stego_file = encInfo->fptr_stego_image;
+    char image_buffer[8] = {0};
+
+    int length = strlen(MAGIC_STRING);
+    for (int i = 0; i < length; i++)
+    {
+        if (fread(image_buffer, sizeof(char), 8, src_file) != 8)
+        {
+            return e_failure;
+        }
+
+        char ch = magic_string[i];
+
+        encode_byte_to_lsb(ch, image_buffer);
+
+        if (fwrite(image_buffer, sizeof(char), 8, stego_file) != 8)
+        {
+            return e_failure;
+        }
+    }
+    return e_success;
+}
+
+Status encode_byte_to_lsb(char data, char *image_buffer)
+{
+    for (int i = 0; i < 8; i++)
+    {
+        image_buffer[i] = (image_buffer[i] & 0xFE);   // Clear the least significant bit
+        char bit = (data & (1 << (7 - i))) >> (7 - i); // Extract the bit from the data
+        image_buffer[i] |= bit;                        // Set the least significant bit with the bit from data
+    }
+    return e_success;
 }
