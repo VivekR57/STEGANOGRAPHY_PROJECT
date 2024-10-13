@@ -119,6 +119,17 @@ Status check_capacity(EncodeInfo *encInfo)
     uint image_capacity = get_image_size_for_bmp(encInfo->fptr_src_image);
     uint size_secret_file = get_file_size(encInfo->fptr_secret);
     uint magic_string_length=strlen(MAGIC_STRING);
-    
+   // encInfo.secret_fname = argv[3];
+    char*file_extension=strchr(encInfo->secret_fname,'.');
+    if(file_extension!=NULL)
+    {
+        uint extension_size=strlen(file_extension);
+        //printf("File Extension is :%s\n",file_extension);
+        //printf("File Extension length is :%u\n",extension_size);
+    }
+    else
+    {
+        printf("The file has no extension\n");
+    }
 
 }
