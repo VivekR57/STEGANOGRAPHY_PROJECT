@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include <string.h> // Add this for string functions
+#include <string.h>
 #include "encode.h"
 #include "types.h"
 
@@ -25,13 +25,13 @@ int main(int argc, char *argv[])
 }
 
 // Check operation type
-OperationType check_operation_type(char *argv[])
+OperationType check_operation_type(char *argv)
 {
-    if (strcmp(argv[1], "-e") == 0)
+    if (strcmp(argv, "-e") == 0)
     {
         return e_encode;
     }
-    else if (strcmp(argv[1], "-d") == 0)
+    else if (strcmp(argv, "-d") == 0)
     {
         return e_decode;
     }
