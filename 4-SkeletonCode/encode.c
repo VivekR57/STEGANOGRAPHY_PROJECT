@@ -129,12 +129,21 @@ Status check_capacity(EncodeInfo *encInfo)
     uint extension_size = 0;
     if (file_extension != NULL)
     {
-        uint extension_size = strlen(file_extension);
-        // printf("File Extension is :%s\n",file_extension);
-        // printf("File Extension length is :%u\n",extension_size);
+        extension_size = strlen(file_extension);
+    }
+    // Include BMP header size in calculations
+    uint header_size = 54;
+
+    uint total_size = header_size + (magic_string_length + extension_size + sizeof(size_secret_file) + size_secret_file) * 8;
+
+    if (image_capacity >= total_size)
+    {
+        printf("Sufficient capacity to encode the secret data.\n");
+        return e_success;
     }
     else
     {
-        printf("The file has no extension\n");
+        printf("ERROR: Insufficient capacity in the image to encode the secret data.\n");
+        return e_failure;
     }
 }
