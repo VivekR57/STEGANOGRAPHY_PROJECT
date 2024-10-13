@@ -118,7 +118,6 @@ Status check_capacity(EncodeInfo *encInfo)
     // Get the size of the source image
     uint image_capacity = get_image_size_for_bmp(encInfo->fptr_src_image);
     uint size_secret_file = get_file_size(encInfo->fptr_secret);
-   printf("HEllo world");
     
 
 }
