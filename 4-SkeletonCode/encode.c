@@ -130,12 +130,11 @@ Status check_capacity(EncodeInfo *encInfo)
     if (file_extension != NULL)
     {
         extension_size = strlen(file_extension);
+        strcpy(encInfo->extn_secret_file, file_extension);
     }
     // Include BMP header size in calculations
-    uint header_size = 54;
-
-    uint total_size = header_size + (magic_string_length + extension_size + sizeof(size_secret_file) + size_secret_file) * 8;
-
+    unsigned int header_size = 54;
+    unsigned int total_size = header_size + ((magic_string_length + extension_size + sizeof(size_secret_file) + size_secret_file)*8);
     if (image_capacity >= total_size)
     {
         printf("Sufficient capacity to encode the secret data.\n");

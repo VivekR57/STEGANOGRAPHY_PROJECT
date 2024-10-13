@@ -26,7 +26,7 @@ int main(int argc, char *argv[])
     }
     return 0;
 }
-OperationType check_operation_type(char *argv[])
+OperationType check_operation_type(char *argv)
 {
     if (strcmp(argv, "-e") == 0)
     {
