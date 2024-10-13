@@ -1,7 +1,9 @@
 #include <stdio.h>
+#include <string.h>
 #include "encode.h"
 #include "types.h"
 
+#define MAGIC_STRING "#*"
 /* Function Definitions */
 
 /* Get image size
@@ -10,6 +12,8 @@
  * Description: In BMP Image, width is stored in offset 18,
  * and height after that. size is 4 bytes
  */
+
+// Get image size
 uint get_image_size_for_bmp(FILE *fptr_image)
 {
     uint width, height;
@@ -28,6 +32,7 @@ uint get_image_size_for_bmp(FILE *fptr_image)
     return width * height * 3;
 }
 
+// Get image size
 uint get_file_size(FILE *fptr)
 {
     uint size;
@@ -44,6 +49,8 @@ uint get_file_size(FILE *fptr)
  * Output: FILE pointer for above files
  * Return Value: e_success or e_failure, on file errors
  */
+
+// Open files
 Status open_files(EncodeInfo *encInfo)
 {
     // Src Image file
@@ -83,6 +90,7 @@ Status open_files(EncodeInfo *encInfo)
     return e_success;
 }
 
+// Do encoding
 Status do_encoding(EncodeInfo *encInfo)
 {
 
@@ -112,6 +120,8 @@ Status do_encoding(EncodeInfo *encInfo)
 
     return e_success;
 }
+
+// Check capacity
 Status check_capacity(EncodeInfo *encInfo)
 {
     // Get the size of the source image
@@ -131,7 +141,7 @@ Status check_capacity(EncodeInfo *encInfo)
     // Include BMP header size in calculations
     unsigned int header_size = 54;
     // Calculate total size correctly
-    unsigned int total_size = header_size + ((magic_string_length + extension_size + size_secret_file+sizeof(size_secret_file)) * 8);
+    unsigned int total_size = header_size + ((magic_string_length + extension_size + size_secret_file + sizeof(size_secret_file)) * 8);
     if (image_capacity >= total_size)
     {
         printf("Sufficient capacity to encode the secret data.\n");
@@ -143,6 +153,8 @@ Status check_capacity(EncodeInfo *encInfo)
         return e_failure;
     }
 }
+
+// Copy BMP header
 Status copy_bmp_header(FILE *fptr_src_image, FILE *fptr_dest_image)
 {
     char buffer[100];
@@ -163,6 +175,8 @@ Status copy_bmp_header(FILE *fptr_src_image, FILE *fptr_dest_image)
 
     return e_success;
 }
+
+// Encode magic string
 Status encode_magic_string(const char *magic_string, EncodeInfo *encInfo)
 {
 
@@ -190,11 +204,13 @@ Status encode_magic_string(const char *magic_string, EncodeInfo *encInfo)
     return e_success;
 }
 
+// Encode byte to LSB
+
 Status encode_byte_to_lsb(char data, char *image_buffer)
 {
     for (int i = 0; i < 8; i++)
     {
-        image_buffer[i] = (image_buffer[i] & 0xFE);   // Clear the least significant bit
+        image_buffer[i] = (image_buffer[i] & 0xFE);    // Clear the least significant bit
         char bit = (data & (1 << (7 - i))) >> (7 - i); // Extract the bit from the data
         image_buffer[i] |= bit;                        // Set the least significant bit with the bit from data
     }
