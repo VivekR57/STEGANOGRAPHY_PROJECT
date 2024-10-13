@@ -114,16 +114,12 @@ Status do_encoding(EncodeInfo *encInfo)
 }
 Status check_capacity(EncodeInfo *encInfo)
 {
-
     // Get the size of the source image
     uint image_capacity = get_image_size_for_bmp(encInfo->fptr_src_image);
-
     // Get the size of the secret file in bytes
     uint size_secret_file = get_file_size(encInfo->fptr_secret);
-
     // Get the length of the magic string in bytes
     uint magic_string_length = strlen(MAGIC_STRING);
-
     // Get the secret file extension
     char *file_extension = strchr(encInfo->secret_fname, '.');
     uint extension_size = 0;
@@ -134,7 +130,8 @@ Status check_capacity(EncodeInfo *encInfo)
     }
     // Include BMP header size in calculations
     unsigned int header_size = 54;
-    unsigned int total_size = header_size + ((magic_string_length + extension_size + sizeof(size_secret_file) + size_secret_file)*8);
+    // Calculate total size correctly
+    unsigned int total_size = header_size + ((magic_string_length + extension_size + size_secret_file) * 8);
     if (image_capacity >= total_size)
     {
         printf("Sufficient capacity to encode the secret data.\n");
