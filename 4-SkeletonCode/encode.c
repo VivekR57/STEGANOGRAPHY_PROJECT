@@ -123,6 +123,11 @@ Status do_encoding(EncodeInfo *encInfo)
         return e_failure;
     }
 
+    if(encode_secret_file_size(encInfo->size_secret_file,encInfo)==e_failure)
+    {
+        return e_failure;
+    }
+
     return e_success;
 }
 
@@ -140,6 +145,7 @@ Status check_capacity(EncodeInfo *encInfo)
     uint extension_size = 0;
     if (file_extension != NULL)
     {
+        encInfo->size_secret_file=strlen(file_extension);
         extension_size = strlen(file_extension);
         strcpy(encInfo->extn_secret_file, file_extension);
     }
@@ -252,7 +258,7 @@ Status encode_secret_file_extn(const char *file_extn, EncodeInfo *encInfo)
         }
 
         char ch = file_extn[i];
-        printf("Encoding character: %c\n", ch);
+       // printf("Encoding character: %c\n", ch);
         encode_byte_to_lsb(ch, image_buffer);
 
         if (fwrite(image_buffer, sizeof(char), 8, stego_file) != 8)
@@ -262,4 +268,21 @@ Status encode_secret_file_extn(const char *file_extn, EncodeInfo *encInfo)
         }
     }
     return e_success;
+}
+
+
+Status encode_secret_file_size(long file_size, EncodeInfo *encInfo)
+{
+    FILE *src_file = encInfo->fptr_src_image;
+    FILE *stego_file = encInfo->fptr_stego_image;
+
+    char image_buffer[8]={0};
+
+    for(int i=0;i<file_size;i++)
+    {
+
+    }
+
+
+
 }
