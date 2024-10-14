@@ -12,6 +12,7 @@ int main(int argc, char *argv[])
     if (check_operation_type(argv[1]) == e_encode)
     {
         printf("User selected Encoding\n");
+        do_encoding(&encInfo);
     }
     else if (check_operation_type(argv[1]) == e_decode)
     {
