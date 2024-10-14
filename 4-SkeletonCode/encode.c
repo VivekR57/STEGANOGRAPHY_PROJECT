@@ -4,6 +4,7 @@
 #include "types.h"
 
 #define MAGIC_STRING "#*"
+#define MAX_SECRET_BUF_SIZE 1
 /* Function Definitions */
 
 /* Get image size
@@ -124,6 +125,16 @@ Status do_encoding(EncodeInfo *encInfo)
     }
 
     if (encode_secret_file_size(encInfo->size_secret_file, encInfo) == e_failure)
+    {
+        return e_failure;
+    }
+
+    if(encode_secret_file_data(encInfo)==e_failure)
+    {
+        return e_failure;
+    }
+
+    if(copy_remaining_img_data(encInfo->fptr_src_image, encInfo->fptr_stego_image) == e_failure)
     {
         return e_failure;
     }
@@ -288,11 +299,55 @@ Status encode_secret_file_size(long file_size, EncodeInfo *encInfo)
     encode_int_to_lsb(file_size, image_buffer);
 
     // Write the modified buffer to the stego image file
-    if (fwrite(image_buffer, size_t(char), 32, stego_file) != 32)
+    if (fwrite(image_buffer, sizeof(char), 32, stego_file) != 32)
     {
         printf("ERROR: Unable to write 32 bytes to stego image\n");
         return e_failure;
     }
 
     return e_success;
+}
+
+Status encode_secret_file_data(EncodeInfo *encInfo)
+{
+    FILE *src_file = encInfo->fptr_src_image;
+    FILE *stego_file = encInfo->fptr_stego_image;
+    FILE*secret_file=encInfo->fptr_secret;
+    if(secret_file==NULL)
+    {
+        printf("ERROR: Unable to open the file\n");
+        return e_failure;
+    }
+    long size=encInfo->size_secret_file;
+    char secret_data[MAX_SECRET_BUF_SIZE];
+
+    if(fread(secret_data,sizeof(char),size,secret_file)!=size)
+    {
+        printf("ERROR: Failed to read secret file data.\n");
+        return e_failure;
+    }
+
+    char image_buffer[8]={0};
+    for(int i=0;i<size;i++)
+    {
+        if(fread(image_buffer,sizeof(char),8,src_file)!=8)
+        {
+            printf("ERROR: Failed to read 8 bytes from source image\n");
+            return e_failure;
+        }
+
+        encode_byte_to_lsb(secret_data[i],image_buffer);
+
+        if(fwrite(image_buffer,sizeof(char),8,stego_file)!=8)
+        {
+            printf("ERROR: Failed to write encoded data to stego image\n");
+            return e_failure;
+        }
+    }
+    return e_success;
+}
+
+Status copy_remaining_img_data(FILE *fptr_src, FILE *fptr_dest)
+{
+    
 }
