@@ -4,7 +4,7 @@
 #include "types.h"
 
 #define MAGIC_STRING "#*"
-#define MAX_SECRET_BUF_SIZE 1
+#define MAX_SECRET_BUF_SIZE 1024
 /* Function Definitions */
 
 /* Get image size
@@ -179,7 +179,7 @@ Status check_capacity(EncodeInfo *encInfo)
 // Copy BMP header
 Status copy_bmp_header(FILE *fptr_src_image, FILE *fptr_dest_image)
 {
-    char buffer[100];
+    char buffer[54];
     rewind(fptr_src_image);
     rewind(fptr_dest_image);
 
@@ -258,7 +258,7 @@ Status encode_secret_file_extn(const char *file_extn, EncodeInfo *encInfo)
     char image_buffer[8] = {0};
 
     int length = strlen(file_extn);
-    printf("Encoding file extension: %s\n", file_extn);
+   // printf("Encoding file extension: %s\n", file_extn);
 
     for (int i = 0; i < length; i++)
     {
@@ -349,5 +349,17 @@ Status encode_secret_file_data(EncodeInfo *encInfo)
 
 Status copy_remaining_img_data(FILE *fptr_src, FILE *fptr_dest)
 {
-    
+    int ch;
+
+    // Loop until the end of the source file
+    while((ch=fgetc(fptr_src))!=EOF)
+    {
+        // Write the character to the destination file
+        if(fputc(ch,fptr_dest)==EOF)
+        {
+            printf("ERROR : unable to write the remaining data to stego image\n");
+            return e_failure;
+        }
+    }
+    return e_success;
 }
