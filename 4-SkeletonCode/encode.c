@@ -118,6 +118,11 @@ Status do_encoding(EncodeInfo *encInfo)
         return e_failure;
     }
 
+    if (encode_secret_file_extn(encInfo->extn_secret_file, encInfo) == e_failure)
+    {
+        return e_failure;
+    }
+
     return e_success;
 }
 
@@ -141,7 +146,7 @@ Status check_capacity(EncodeInfo *encInfo)
     // Include BMP header size in calculations
     unsigned int header_size = 54;
     // Calculate total size correctly
-    unsigned int total_size = header_size + ((magic_string_length + extension_size + size_secret_file + sizeof(size_secret_file)+sizeof(extension_size)) * 8);
+    unsigned int total_size = header_size + ((magic_string_length + extension_size + size_secret_file + sizeof(size_secret_file) + sizeof(extension_size)) * 8);
     if (image_capacity >= total_size)
     {
         printf("Sufficient capacity to encode the secret data.\n");
@@ -217,41 +222,44 @@ Status encode_byte_to_lsb(char data, char *image_buffer)
     return e_success;
 }
 
-Status encode_int_to_lsb(int data, char *image_buffer) {
-    for (int i = 0; i < 32; i++) {
-        image_buffer[i] = (image_buffer[i] & 0xFE); // Clear the LSB
+Status encode_int_to_lsb(int data, char *image_buffer)
+{
+    for (int i = 0; i < 32; i++)
+    {
+        image_buffer[i] = (image_buffer[i] & 0xFE);     // Clear the LSB
         int bit = (data & (1 << (31 - i))) >> (31 - i); // Extract the bit from data
-        image_buffer[i] |= bit; // Set the LSB with the extracted bit
+        image_buffer[i] |= bit;                         // Set the LSB with the extracted bit
     }
     return e_success;
 }
 
 /* Encode secret file extenstion */
-Status encode_secret_file_extn(const char *file_extn, EncodeInfo *encInfo) 
+Status encode_secret_file_extn(const char *file_extn, EncodeInfo *encInfo)
 {
-
     FILE *src_file = encInfo->fptr_src_image;
     FILE *stego_file = encInfo->fptr_stego_image;
-    char image_buffer[8]={0};
+    char image_buffer[8] = {0};
 
-    int length=strlen(file_extn);
+    int length = strlen(file_extn);
+    printf("Encoding file extension: %s\n", file_extn);
 
-    for(int i=0;i<length;i++)
+    for (int i = 0; i < length; i++)
     {
-        if(fread(image_buffer,sizeof(char),8,src_file)!=8)
+        if (fread(image_buffer, sizeof(char), 8, src_file) != 8)
         {
+            printf("Failed to read 8 bytes from source file\n");
             return e_failure;
         }
 
-        char ch=file_extn[i];
-        encode_byte_to_lsb(ch,image_buffer);
+        char ch = file_extn[i];
+        printf("Encoding character: %c\n", ch);
+        encode_byte_to_lsb(ch, image_buffer);
 
-        if(fwrite(image_buffer,sizeof(char),8,stego_file)!=8)
+        if (fwrite(image_buffer, sizeof(char), 8, stego_file) != 8)
         {
+            printf("Failed to write 8 bytes to stego file\n");
             return e_failure;
         }
-
-        return e_success;
     }
-
-} 
+    return e_success;
+}
