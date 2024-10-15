@@ -25,7 +25,11 @@ int main(int argc, char *argv[])
     return 0;
 }
 
-// Check operation type
+/*check operation type
+DESCRIPTION:check_operation_type based on the command line argument
+INPUT:command line argument as input for encode '-e' and for decode '-d'
+output:it will return based on input for '-e' return e_encode and '-d' return e_decode and for invalid input return e_unspported
+*/
 OperationType check_operation_type(char *argv)
 {
     if (strcmp(argv, "-e") == 0)
