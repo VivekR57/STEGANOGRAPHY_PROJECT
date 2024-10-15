@@ -91,7 +91,11 @@ Status open_files(EncodeInfo *encInfo)
     return e_success;
 }
 
-// Do encoding
+/*It manges the encoding process
+Description:It manages the encoding process,calling other function like open file,check capacity and all other functions
+INPUT:Get the structure pointer as input
+output: If all operation success means return e_succes or if not means return e_failure
+*/
 Status do_encoding(EncodeInfo *encInfo)
 {
 
@@ -141,8 +145,12 @@ Status do_encoding(EncodeInfo *encInfo)
 
     return e_success;
 }
-
-// Check capacity
+/*
+check capacity
+Description:check if the BMP image has sufficient capacity to encode the secret data or not
+input:source image,secret file,magic string,file extension,header size
+Output:if the image can hold the required data means return e_succes otherwise return e_failure
+*/
 Status check_capacity(EncodeInfo *encInfo)
 {
     // Get the size of the source image
