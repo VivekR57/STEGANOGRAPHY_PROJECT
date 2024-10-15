@@ -184,7 +184,12 @@ Status check_capacity(EncodeInfo *encInfo)
     }
 }
 
-// Copy BMP header
+/*
+copy BMP header
+Description:copying BMP Header from source image to destination image
+Input:file pointer of source image and file pointer of destination image
+Output:If the function succesfully copies BMP Header from source image to destination means return e_succes ,if fails means return e_failure 
+*/
 Status copy_bmp_header(FILE *fptr_src_image, FILE *fptr_dest_image)
 {
     char buffer[54];
@@ -206,7 +211,11 @@ Status copy_bmp_header(FILE *fptr_src_image, FILE *fptr_dest_image)
     return e_success;
 }
 
-// Encode magic string
+/*Encode magic string
+Description:Encode a magic string into the LSB of BMP image
+Input:magic string
+output:If the magic string is encoded to the corresponding bits in the image means return e_success ,otherwise return e_failure
+*/
 Status encode_magic_string(const char *magic_string, EncodeInfo *encInfo)
 {
 
@@ -234,7 +243,12 @@ Status encode_magic_string(const char *magic_string, EncodeInfo *encInfo)
     return e_success;
 }
 
-// Encode byte to LSB
+/*
+Encode byte to LSB
+Description : Encode aa byte into LSB of a provided image buffer
+Input: data,image buffer
+Output: if  the byte is  Encoded into LSB of image means return e_success
+*/
 
 Status encode_byte_to_lsb(char data, char *image_buffer)
 {
@@ -247,6 +261,13 @@ Status encode_byte_to_lsb(char data, char *image_buffer)
     return e_success;
 }
 
+
+/*
+Encode Int to LSB
+Description:Encode a inter value into the LSB of the provided image buffer
+Input: data,image buffer
+output: if the bytes is encode into LSB of image means return e_succes
+*/
 Status encode_int_to_lsb(int data, char *image_buffer)
 {
     for (int i = 0; i < 32; i++)
@@ -258,7 +279,12 @@ Status encode_int_to_lsb(int data, char *image_buffer)
     return e_success;
 }
 
-/* Encode secret file extenstion */
+/* 
+Encode secret file extenstion 
+Description:Encode the file extension of secret file into BMP image's LSB
+Input: file extension
+Output: if the file extension is modifies into the corresponding bits in the image means return e_success otherwise return e_failure
+*/
 Status encode_secret_file_extn(const char *file_extn, EncodeInfo *encInfo)
 {
     FILE *src_file = encInfo->fptr_src_image;
@@ -289,6 +315,13 @@ Status encode_secret_file_extn(const char *file_extn, EncodeInfo *encInfo)
     return e_success;
 }
 
+
+/*
+Encode secret file size
+Description:Encode the  size of the secret file into the BMP image LSB
+Input: file size
+Output: if the file size modified into the corresponding bits in the image means return e_success otherwise return e_failure
+*/
 Status encode_secret_file_size(long file_size, EncodeInfo *encInfo)
 {
     FILE *src_file = encInfo->fptr_src_image;
@@ -315,6 +348,12 @@ Status encode_secret_file_size(long file_size, EncodeInfo *encInfo)
 
     return e_success;
 }
+
+/* Encode secret file data
+Description:Encode the actual data of the secret file into the LSB of the BMP image
+Input: file pointer of secret file
+Output: if the secret file data is encoded into the LSB of the BMP image means return e_success otherwise return e_failure
+*/
 
 Status encode_secret_file_data(EncodeInfo *encInfo)
 {
@@ -354,6 +393,12 @@ Status encode_secret_file_data(EncodeInfo *encInfo)
     }
     return e_success;
 }
+
+/*Copy remaining image data
+Description: copies the remaining data of the source BMP image to the destination BMP image after encoding all the things 
+Input: file pointer of source image and destination image
+Output: if the source image copies those bytes to the stego image means return e_success otherwise return e_failure
+*/
 
 Status copy_remaining_img_data(FILE *fptr_src, FILE *fptr_dest)
 {
