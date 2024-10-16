@@ -51,7 +51,6 @@ uint get_file_size(FILE *fptr)
  * Return Value: e_success or e_failure, on file errors
  */
 
-// Open files
 Status open_files(EncodeInfo *encInfo)
 {
     // Src Image file
@@ -416,3 +415,4 @@ Status copy_remaining_img_data(FILE *fptr_src, FILE *fptr_dest)
     }
     return e_success;
 }
+
