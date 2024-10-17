@@ -6,6 +6,7 @@
 int main(int argc, char *argv[])
 {
     EncodeInfo encInfo;
+    DecodeInfo decInfo;
     encInfo.src_image_fname = argv[2];
     encInfo.secret_fname = argv[3];
     encInfo.stego_image_fname = "stego_img.bmp";
