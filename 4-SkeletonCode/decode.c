@@ -98,7 +98,7 @@ Status decode_lsb_to_int(int *data, char *image_buffer)
 Status decode_file_extn_size(DecodeInfo *decInfo)
 {
     char image_buffer[32] = {0};
-    long extn_size = 0;
+    int extn_size = 0;
     if (fread(image_buffer, sizeof(char), 32, decInfo->fptr_stego_image) != 32)
     {
         printf("ERROR: Unable to read 32 bytes from Stego image image\n");
@@ -127,5 +127,17 @@ Status decode_secret_file_extn(DecodeInfo *decInfo)
     return e_success;
 }
 
+Status decode_secret_file_size(DecodeInfo *decInfo)
+{
+    
+    return e_success;
+}
+
+
+Status decode_secret_file_data(DecodeInfo *decInfo)
+{
+    
+    return e_success;
+}
 
 

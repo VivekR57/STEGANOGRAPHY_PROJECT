@@ -1,6 +1,5 @@
 #ifndef ENCODE_H
 #define ENCODE_H
-
 #include "types.h" // Contains user defined types
 
 /* 

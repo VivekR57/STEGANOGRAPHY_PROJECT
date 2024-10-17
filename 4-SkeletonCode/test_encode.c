@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <string.h>
 #include "encode.h"
+#include "decode.h"
+#include "decode.h"
 #include "types.h"
 
 int main(int argc, char *argv[])
