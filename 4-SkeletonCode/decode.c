@@ -111,10 +111,22 @@ Status decode_file_extn_size(DecodeInfo *decInfo)
 
 Status decode_secret_file_extn(DecodeInfo *decInfo)
 {
+    int size = 0;
     char file_exten[5];
     char image_buffer[8] = {0};
+    char image_buffer_1[32] = {0};
+    char output_file_name[20] = "output";
 
-    for (int i = 0; i < 4; i++)
+    if (fread(image_buffer_1, sizeof(char), 32, decInfo->fptr_stego_image) != 32)
+    {
+        printf("ERROR: Unable to read 32 bytes from the stego image for file extension size\n");
+        return e_failure;
+    }
+    decode_lsb_to_int(&size,image_buffer);
+
+    
+
+    for (int i = 0; i < size; i++)
     {
         if (fread(image_buffer, sizeof(char), 8, decInfo->fptr_stego_image) != 8)
         {
@@ -123,21 +135,20 @@ Status decode_secret_file_extn(DecodeInfo *decInfo)
         }
         decode_lsb_to_byte(&file_exten[i], image_buffer);
     }
+    file_exten[size]='\0';
+    decInfo->length=size;
+    decInfo->extension=file_exten;
+
+    strcat(output_file_name, file_exten);
     printf("The file extension is: %s\n", file_exten);
+
+    decInfo->fptr_output_file = fopen(output_file_name, "w");
+    if (decInfo->fptr_output_file == NULL)
+    {
+        printf("ERROR : Unable to open the output file\n");
+        return e_failure;
+    }
+
+    printf("Output file created: %s\n", output_file_name);
     return e_success;
 }
-
-Status decode_secret_file_size(DecodeInfo *decInfo)
-{
-    
-    return e_success;
-}
-
-
-Status decode_secret_file_data(DecodeInfo *decInfo)
-{
-    
-    return e_success;
-}
-
-
