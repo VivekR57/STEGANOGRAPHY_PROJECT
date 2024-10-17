@@ -122,6 +122,11 @@ Status do_encoding(EncodeInfo *encInfo)
         return e_failure;
     }
 
+    if(encode_secret_extn_size(encInfo->extn_size,encInfo)==e_failure)
+    {
+        return e_failure;
+    }
+
     if (encode_secret_file_extn(encInfo->extn_secret_file, encInfo) == e_failure)
     {
         return e_failure;
@@ -165,6 +170,7 @@ Status check_capacity(EncodeInfo *encInfo)
     {
         encInfo->size_secret_file = strlen(file_extension);
         extension_size = strlen(file_extension);
+        encInfo->extn_size=extension_size;
         strcpy(encInfo->extn_secret_file, file_extension);
     }
     // Include BMP header size in calculations
@@ -239,6 +245,32 @@ Status encode_magic_string(const char *magic_string, EncodeInfo *encInfo)
             return e_failure;
         }
     }
+    return e_success;
+}
+Status encode_secret_extn_size(long file_size, EncodeInfo *encInfo)
+{
+    FILE *src_file = encInfo->fptr_src_image;
+    FILE *stego_file = encInfo->fptr_stego_image;
+
+    char image_buffer[32] = {0};
+
+    // Read 32 bytes from the source image file
+    if (fread(image_buffer, sizeof(char), 32, src_file) != 32)
+    {
+        printf("ERROR: Unable to read 32 bytes from source image\n");
+        return e_failure;
+    }
+
+    // Encode the file size into LSBs of the 32-byte buffer
+    encode_int_to_lsb(file_size, image_buffer);
+
+    // Write the modified buffer to the stego image file
+    if (fwrite(image_buffer, sizeof(char), 32, stego_file) != 32)
+    {
+        printf("ERROR: Unable to write 32 bytes to stego image\n");
+        return e_failure;
+    }
+
     return e_success;
 }
 

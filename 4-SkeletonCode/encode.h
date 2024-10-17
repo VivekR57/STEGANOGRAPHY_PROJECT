@@ -29,6 +29,7 @@ typedef struct _EncodeInfo
     char extn_secret_file[MAX_FILE_SUFFIX]; //Buffer to store the file extension of the secret file.
     char secret_data[MAX_SECRET_BUF_SIZE]; //Buffer to store the data from the secret file.
     long size_secret_file; //Size of the secret file in bytes.
+    long extn_size;
 
     /* Stego Image Info */
     char *stego_image_fname;
@@ -65,6 +66,9 @@ Status copy_bmp_header(FILE *fptr_src_image, FILE *fptr_dest_image);
 
 /* Store Magic String */
 Status encode_magic_string(const char *magic_string, EncodeInfo *encInfo);
+
+/*Encode secret file extension size*/
+Status encode_secret_extn_size(long file_size, EncodeInfo *encInfo);
 
 /* Encode secret file extenstion */
 Status encode_secret_file_extn(const char *file_extn, EncodeInfo *encInfo);
