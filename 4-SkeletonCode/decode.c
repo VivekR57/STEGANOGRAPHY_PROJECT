@@ -3,7 +3,29 @@
 #include "decode.h"
 #include "types.h"
 
+Status read_and_validate_decode_args(int argc, char *argv[], DecodeInfo *decInfo)
+{
+    if (argc < 3 || argc > 4)
+    {
+        printf("ERROR: Invalid number of arguments.\n");
+        return e_failure;
+    }
 
+    if (strstr(argv[2], ".bmp") == NULL)
+    {
+        printf("ERROR: Source image file must have a .bmp extension.\n");
+        return e_failure;
+    }
+    decInfo->stego_image_fname1 = argv[2];
+    if (argc == 4)
+    {
+        decInfo->output_fname = argv[3]; // Store provided output filename
+    }
+    else
+    {
+        decInfo->output_fname= "output.txt"; // Assign a default filename if not provided
+    }
+}
 Status do_decoding(DecodeInfo *decInfo)
 {
     if (open_files_for_decode(decInfo) == e_failure)
@@ -66,7 +88,7 @@ Status decode_magic_string(DecodeInfo *decInfo)
         decode_lsb_to_byte(&decoded_magic_string[i], image_buffer);
     }
 
-    decoded_magic_string[strlen(magic_string)] = '\0'; 
+    decoded_magic_string[strlen(magic_string)] = '\0';
 
     if (strcmp(magic_string, decoded_magic_string) == 0)
     {
@@ -135,7 +157,7 @@ Status decode_secret_file_extn(DecodeInfo *decInfo)
 
     file_exten[size] = '\0';
     strcpy(decInfo->extension, file_exten);
-    strcat(output_file_name, file_exten); 
+    strcat(output_file_name, file_exten);
     decInfo->fptr_output_file = fopen(output_file_name, "w");
     if (decInfo->fptr_output_file == NULL)
     {
@@ -158,7 +180,7 @@ Status decode_secret_file_size(DecodeInfo *decInfo)
     }
 
     decode_lsb_to_int(&size, image_buffer);
-    printf("----%d\n",size);
+    printf("----%d\n", size);
     decInfo->file_size = size;
     return e_success;
 }
@@ -169,7 +191,7 @@ Status decode_secret_file_data(DecodeInfo *decInfo)
 
     char buffer[8];
     char ch;
-    printf("%d\n",decInfo->file_size);
+    printf("%d\n", decInfo->file_size);
     for (int i = 0; i < decInfo->file_size; i++)
     {
         if (fread(buffer, sizeof(char), 8, decInfo->fptr_stego_image) != 8)

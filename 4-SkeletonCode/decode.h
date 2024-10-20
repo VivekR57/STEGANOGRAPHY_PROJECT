@@ -12,10 +12,11 @@ typedef struct _DecodeInfo
     char extension[5];
     int length;
 
+    char *output_fname;
     FILE *fptr_output_file;
 } DecodeInfo;
 
-Status read_and_validate_decode_args(char *argv[], DecodeInfo *decInfo);
+Status read_and_validate_decode_args(int argc, char *argv[], DecodeInfo *decInfo);
 
 /* Perform decoding */
 Status do_decoding(DecodeInfo *decInfo);

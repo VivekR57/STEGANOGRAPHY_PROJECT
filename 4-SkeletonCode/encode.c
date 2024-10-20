@@ -42,6 +42,46 @@ uint get_file_size(FILE *fptr)
     rewind(fptr);
     return size;
 }
+Status read_and_validate_encode_args(int argc, char *argv[], EncodeInfo *encInfo)
+{
+    // Validate argument count
+    if (argc < 4 || argc > 5)
+    {
+        printf("ERROR: Invalid number of arguments.\n");
+        return e_failure;
+    }
+
+    // Check if the source image file has a .bmp extension
+    if (strstr(argv[2], ".bmp") == NULL)
+    {
+        printf("ERROR: Source image file must have a .bmp extension.\n");
+        return e_failure;
+    }
+
+    // Check if the secret file has a dot in its name
+    if (strchr(argv[3], '.') == NULL)
+    {
+        printf("ERROR: Secret file must have a valid extension.\n");
+        return e_failure;
+    }
+
+    // Store values in the EncodeInfo structure
+    encInfo->src_image_fname = argv[2];
+    encInfo->secret_fname = argv[3];
+
+    // Check for optional stego image file
+    if (argc == 5 && strstr(argv[4], ".bmp") != NULL)
+    {
+
+        encInfo->stego_image_fname = argv[4];
+    }
+    else
+    {
+        encInfo->stego_image_fname = "stego_img.bmp"; // Default name if not provided
+    }
+
+    return e_success;
+}
 
 /*
  * Get File pointers for i/p and o/p files
@@ -358,7 +398,7 @@ Status encode_secret_file_size(long file_size, EncodeInfo *encInfo)
     char image_buffer[32] = {0};
     fseek(encInfo->fptr_secret, 0, SEEK_END);
     file_size = ftell(encInfo->fptr_secret);
-   // printf("%ld\n",file_size);
+    // printf("%ld\n",file_size);
 
     if (fread(image_buffer, sizeof(char), 32, src_file) != 32)
     {
@@ -395,7 +435,7 @@ Status encode_secret_file_data(EncodeInfo *encInfo)
     fseek(secret_file, 0, SEEK_END);
     long size = ftell(secret_file);
     rewind(secret_file);
-    printf("%d\n",size);
+    printf("%d\n", size);
     encInfo->size_secret_file = size; // Set the correct file size
 
     // Read and encode the secret file data
