@@ -23,11 +23,11 @@ uint get_image_size_for_bmp(FILE *fptr_image)
 
     // Read the width (an int)
     fread(&width, sizeof(int), 1, fptr_image);
-    printf("width = %u\n", width);
+    //printf("width = %u\n", width);
 
     // Read the height (an int)
     fread(&height, sizeof(int), 1, fptr_image);
-    printf("height = %u\n", height);
+   // printf("height = %u\n", height);
 
     // Return image capacity
     return width * height * 3;
@@ -47,7 +47,7 @@ Status read_and_validate_encode_args(int argc, char *argv[], EncodeInfo *encInfo
     // Validate argument count
     if (argc < 4 || argc > 5)
     {
-        printf("ERROR: Invalid number of arguments.\n");
+        printf("Encoding: ./lsb_steg -e <.bmp file> <.txt file> [output file]\n");
         return e_failure;
     }
 
@@ -219,12 +219,12 @@ Status check_capacity(EncodeInfo *encInfo)
     unsigned int total_size = header_size + ((magic_string_length + extension_size + size_secret_file + sizeof(size_secret_file) + sizeof(extension_size)) * 8);
     if (image_capacity >= total_size)
     {
-        printf("Sufficient capacity to encode the secret data.\n");
+       // printf("Sufficient capacity to encode the secret data.\n");
         return e_success;
     }
     else
     {
-        printf("ERROR: Insufficient capacity in the image to encode the secret data.\n");
+      //  printf("ERROR: Insufficient capacity in the image to encode the secret data.\n");
         return e_failure;
     }
 }
@@ -435,7 +435,7 @@ Status encode_secret_file_data(EncodeInfo *encInfo)
     fseek(secret_file, 0, SEEK_END);
     long size = ftell(secret_file);
     rewind(secret_file);
-    printf("%d\n", size);
+   // printf("%d\n", size);
     encInfo->size_secret_file = size; // Set the correct file size
 
     // Read and encode the secret file data

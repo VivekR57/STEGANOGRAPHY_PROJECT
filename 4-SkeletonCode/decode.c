@@ -7,7 +7,8 @@ Status read_and_validate_decode_args(int argc, char *argv[], DecodeInfo *decInfo
 {
     if (argc < 3 || argc > 4)
     {
-        printf("ERROR: Invalid number of arguments.\n");
+        printf("  Encoding: ./lsb_steg -e <.bmp file> <.txt file> [output file]\n");
+        printf("  Decoding: ./lsb_steg -d <.bmp file> [output file]\n");
         return e_failure;
     }
 
@@ -23,7 +24,7 @@ Status read_and_validate_decode_args(int argc, char *argv[], DecodeInfo *decInfo
     }
     else
     {
-        decInfo->output_fname= "output.txt"; // Assign a default filename if not provided
+        decInfo->output_fname = "output.txt"; // Assign a default filename if not provided
     }
 }
 Status do_decoding(DecodeInfo *decInfo)
@@ -92,7 +93,7 @@ Status decode_magic_string(DecodeInfo *decInfo)
 
     if (strcmp(magic_string, decoded_magic_string) == 0)
     {
-        printf("The decoded magic string matches the input magic string!\n");
+       // printf("The decoded magic string matches the input magic string!\n");
         return e_success;
     }
     else
@@ -165,7 +166,7 @@ Status decode_secret_file_extn(DecodeInfo *decInfo)
         return e_failure;
     }
 
-    printf("Output file created: %s\n", output_file_name);
+  //  printf("Output file created: %s\n", output_file_name);
     return e_success;
 }
 
@@ -180,7 +181,7 @@ Status decode_secret_file_size(DecodeInfo *decInfo)
     }
 
     decode_lsb_to_int(&size, image_buffer);
-    printf("----%d\n", size);
+   // printf("----%d\n", size);
     decInfo->file_size = size;
     return e_success;
 }
@@ -191,7 +192,7 @@ Status decode_secret_file_data(DecodeInfo *decInfo)
 
     char buffer[8];
     char ch;
-    printf("%d\n", decInfo->file_size);
+ //   printf("%d\n", decInfo->file_size);
     for (int i = 0; i < decInfo->file_size; i++)
     {
         if (fread(buffer, sizeof(char), 8, decInfo->fptr_stego_image) != 8)

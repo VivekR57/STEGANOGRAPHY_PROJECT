@@ -11,20 +11,20 @@ int main(int argc, char *argv[])
     DecodeInfo decInfo;
     if (check_operation_type(argv[1]) == e_encode)
     {
-        printf("User selected Encoding\n");
+       // printf("User selected Encoding\n");
         if (read_and_validate_encode_args(argc, argv, &encInfo) == e_failure)
         {
-            printf("Argument validation failed. Exiting...\n");
+            //printf("Argument validation failed. Exiting...\n");
             return e_failure;
         }
         do_encoding(&encInfo);
     }
     else if (check_operation_type(argv[1]) == e_decode)
     {
-        printf("User selected Decoding\n");
+      //  printf("User selected Decoding\n");
         if (read_and_validate_decode_args(argc, argv, &decInfo) == e_failure)
         {
-            printf("Argument validation failed. Exiting...\n");
+           // printf("Argument validation failed. Exiting...\n");
             return e_failure;
         } 
         do_decoding(&decInfo);
