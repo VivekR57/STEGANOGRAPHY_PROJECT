@@ -12,6 +12,8 @@ int main(int argc, char *argv[])
     encInfo.src_image_fname = argv[2];
     encInfo.secret_fname = argv[3];
     encInfo.stego_image_fname = "stego_img.bmp";
+
+    decInfo.stego_image_fname1="stego_img.bmp";
     if (check_operation_type(argv[1]) == e_encode)
     {
         printf("User selected Encoding\n");
@@ -20,7 +22,7 @@ int main(int argc, char *argv[])
     else if (check_operation_type(argv[1]) == e_decode)
     {
         printf("User selected Decoding\n");
-        do_encoding(&encInfo);
+       do_decoding(&decInfo);
     }
     else
     {

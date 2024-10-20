@@ -122,7 +122,7 @@ Status do_encoding(EncodeInfo *encInfo)
         return e_failure;
     }
 
-    if(encode_secret_extn_size(encInfo->extn_size,encInfo)==e_failure)
+    if (encode_secret_extn_size(encInfo->extn_size, encInfo) == e_failure)
     {
         return e_failure;
     }
@@ -137,12 +137,12 @@ Status do_encoding(EncodeInfo *encInfo)
         return e_failure;
     }
 
-    if(encode_secret_file_data(encInfo)==e_failure)
+    if (encode_secret_file_data(encInfo) == e_failure)
     {
         return e_failure;
     }
 
-    if(copy_remaining_img_data(encInfo->fptr_src_image, encInfo->fptr_stego_image) == e_failure)
+    if (copy_remaining_img_data(encInfo->fptr_src_image, encInfo->fptr_stego_image) == e_failure)
     {
         return e_failure;
     }
@@ -170,7 +170,7 @@ Status check_capacity(EncodeInfo *encInfo)
     {
         encInfo->size_secret_file = strlen(file_extension);
         extension_size = strlen(file_extension);
-        encInfo->extn_size=extension_size;
+        encInfo->extn_size = extension_size;
         strcpy(encInfo->extn_secret_file, file_extension);
     }
     // Include BMP header size in calculations
@@ -193,7 +193,7 @@ Status check_capacity(EncodeInfo *encInfo)
 copy BMP header
 Description:copying BMP Header from source image to destination image
 Input:file pointer of source image and file pointer of destination image
-Output:If the function succesfully copies BMP Header from source image to destination means return e_succes ,if fails means return e_failure 
+Output:If the function succesfully copies BMP Header from source image to destination means return e_succes ,if fails means return e_failure
 */
 Status copy_bmp_header(FILE *fptr_src_image, FILE *fptr_dest_image)
 {
@@ -292,7 +292,6 @@ Status encode_byte_to_lsb(char data, char *image_buffer)
     return e_success;
 }
 
-
 /*
 Encode Int to LSB
 Description:Encode a inter value into the LSB of the provided image buffer
@@ -310,8 +309,8 @@ Status encode_int_to_lsb(int data, char *image_buffer)
     return e_success;
 }
 
-/* 
-Encode secret file extenstion 
+/*
+Encode secret file extenstion
 Description:Encode the file extension of secret file into BMP image's LSB
 Input: file extension
 Output: if the file extension is modifies into the corresponding bits in the image means return e_success otherwise return e_failure
@@ -323,7 +322,7 @@ Status encode_secret_file_extn(const char *file_extn, EncodeInfo *encInfo)
     char image_buffer[8] = {0};
 
     int length = strlen(file_extn);
-   // printf("Encoding file extension: %s\n", file_extn);
+    // printf("Encoding file extension: %s\n", file_extn);
 
     for (int i = 0; i < length; i++)
     {
@@ -346,7 +345,6 @@ Status encode_secret_file_extn(const char *file_extn, EncodeInfo *encInfo)
     return e_success;
 }
 
-
 /*
 Encode secret file size
 Description:Encode the  size of the secret file into the BMP image LSB
@@ -357,20 +355,19 @@ Status encode_secret_file_size(long file_size, EncodeInfo *encInfo)
 {
     FILE *src_file = encInfo->fptr_src_image;
     FILE *stego_file = encInfo->fptr_stego_image;
-
     char image_buffer[32] = {0};
+    fseek(encInfo->fptr_secret, 0, SEEK_END);
+    file_size = ftell(encInfo->fptr_secret);
+   // printf("%ld\n",file_size);
 
-    // Read 32 bytes from the source image file
     if (fread(image_buffer, sizeof(char), 32, src_file) != 32)
     {
         printf("ERROR: Unable to read 32 bytes from source image\n");
         return e_failure;
     }
 
-    // Encode the file size into LSBs of the 32-byte buffer
     encode_int_to_lsb(file_size, image_buffer);
 
-    // Write the modified buffer to the stego image file
     if (fwrite(image_buffer, sizeof(char), 32, stego_file) != 32)
     {
         printf("ERROR: Unable to write 32 bytes to stego image\n");
@@ -390,43 +387,46 @@ Status encode_secret_file_data(EncodeInfo *encInfo)
 {
     FILE *src_file = encInfo->fptr_src_image;
     FILE *stego_file = encInfo->fptr_stego_image;
-    FILE*secret_file=encInfo->fptr_secret;
-    if(secret_file==NULL)
-    {
-        printf("ERROR: Unable to open the file\n");
-        return e_failure;
-    }
-    long size=encInfo->size_secret_file;
-    char secret_data[MAX_SECRET_BUF_SIZE];
+    FILE *secret_file = encInfo->fptr_secret;
+    char secret_data;
+    char image_buffer[8] = {0};
 
-    if(fread(secret_data,sizeof(char),size,secret_file)!=size)
-    {
-        printf("ERROR: Failed to read secret file data.\n");
-        return e_failure;
-    }
+    // Get the actual size of the secret file
+    fseek(secret_file, 0, SEEK_END);
+    long size = ftell(secret_file);
+    rewind(secret_file);
+    printf("%d\n",size);
+    encInfo->size_secret_file = size; // Set the correct file size
 
-    char image_buffer[8]={0};
-    for(int i=0;i<size;i++)
+    // Read and encode the secret file data
+    for (int i = 0; i < size; i++)
     {
-        if(fread(image_buffer,sizeof(char),8,src_file)!=8)
+        if (fread(&secret_data, sizeof(char), 1, secret_file) != 1)
         {
-            printf("ERROR: Failed to read 8 bytes from source image\n");
+            printf("ERROR: Unable to read secret file data\n");
             return e_failure;
         }
 
-        encode_byte_to_lsb(secret_data[i],image_buffer);
-
-        if(fwrite(image_buffer,sizeof(char),8,stego_file)!=8)
+        if (fread(image_buffer, sizeof(char), 8, src_file) != 8)
         {
-            printf("ERROR: Failed to write encoded data to stego image\n");
+            printf("ERROR: Unable to read 8 bytes from source image\n");
+            return e_failure;
+        }
+
+        encode_byte_to_lsb(secret_data, image_buffer);
+
+        if (fwrite(image_buffer, sizeof(char), 8, stego_file) != 8)
+        {
+            printf("ERROR: Unable to write encoded data to stego image\n");
             return e_failure;
         }
     }
+
     return e_success;
 }
 
 /*Copy remaining image data
-Description: copies the remaining data of the source BMP image to the destination BMP image after encoding all the things 
+Description: copies the remaining data of the source BMP image to the destination BMP image after encoding all the things
 Input: file pointer of source image and destination image
 Output: if the source image copies those bytes to the stego image means return e_success otherwise return e_failure
 */
@@ -436,10 +436,10 @@ Status copy_remaining_img_data(FILE *fptr_src, FILE *fptr_dest)
     int ch;
 
     // Loop until the end of the source file
-    while((ch=fgetc(fptr_src))!=EOF)
+    while ((ch = fgetc(fptr_src)) != EOF)
     {
         // Write the character to the destination file
-        if(fputc(ch,fptr_dest)==EOF)
+        if (fputc(ch, fptr_dest) == EOF)
         {
             printf("ERROR : unable to write the remaining data to stego image\n");
             return e_failure;
@@ -447,4 +447,3 @@ Status copy_remaining_img_data(FILE *fptr_src, FILE *fptr_dest)
     }
     return e_success;
 }
-

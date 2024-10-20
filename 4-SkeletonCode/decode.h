@@ -6,7 +6,8 @@
 typedef struct _DecodeInfo
 {
     FILE *fptr_stego_image;
-    char *stego_image_fname;
+    char *stego_image_fname1;
+    int file_size;
 
     char extension[5];
     int length;
