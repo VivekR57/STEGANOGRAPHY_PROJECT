@@ -23,11 +23,11 @@ uint get_image_size_for_bmp(FILE *fptr_image)
 
     // Read the width (an int)
     fread(&width, sizeof(int), 1, fptr_image);
-    //printf("width = %u\n", width);
+    // printf("width = %u\n", width);
 
     // Read the height (an int)
     fread(&height, sizeof(int), 1, fptr_image);
-   // printf("height = %u\n", height);
+    // printf("height = %u\n", height);
 
     // Return image capacity
     return width * height * 3;
@@ -125,8 +125,12 @@ Status open_files(EncodeInfo *encInfo)
 
         return e_failure;
     }
-
     // No failure return e_success
+    printf("INFO: Opening required files\n");
+    printf("INFO: Opened %s\n", encInfo->src_image_fname);
+    printf("INFO: Opened %s\n", encInfo->secret_fname);
+    printf("INFO: Opened %s\n", encInfo->stego_image_fname);
+    printf("INFO: Done\n");
     return e_success;
 }
 
@@ -143,6 +147,7 @@ Status do_encoding(EncodeInfo *encInfo)
     {
         return e_failure;
     }
+    printf("INFO: ## Encoding Procedure Started ##\n");
 
     // Check capacity
     if (check_capacity(encInfo) == e_failure)
@@ -186,7 +191,7 @@ Status do_encoding(EncodeInfo *encInfo)
     {
         return e_failure;
     }
-
+    printf("INFO: ## Encoding Done Successfully ##\n");
     return e_success;
 }
 /*
@@ -219,12 +224,13 @@ Status check_capacity(EncodeInfo *encInfo)
     unsigned int total_size = header_size + ((magic_string_length + extension_size + size_secret_file + sizeof(size_secret_file) + sizeof(extension_size)) * 8);
     if (image_capacity >= total_size)
     {
-       // printf("Sufficient capacity to encode the secret data.\n");
+        printf("INFO: Checking for %s capacity to handle %s\n", encInfo->src_image_fname, encInfo->secret_fname);
+        printf("INFO: Done. Found OK\n");
         return e_success;
     }
     else
     {
-      //  printf("ERROR: Insufficient capacity in the image to encode the secret data.\n");
+        //  printf("ERROR: Insufficient capacity in the image to encode the secret data.\n");
         return e_failure;
     }
 }
@@ -252,7 +258,8 @@ Status copy_bmp_header(FILE *fptr_src_image, FILE *fptr_dest_image)
         printf("ERROR: Unable to write the BMP header from the destination image.\n");
         return e_failure;
     }
-
+    printf("INFO: Copying Image Header\n");
+    printf("INFO: Done\n");
     return e_success;
 }
 
@@ -285,6 +292,8 @@ Status encode_magic_string(const char *magic_string, EncodeInfo *encInfo)
             return e_failure;
         }
     }
+    printf("INFO: Encoding Magic String Signature\n");
+    printf("INFO: Done\n");
     return e_success;
 }
 Status encode_secret_extn_size(long file_size, EncodeInfo *encInfo)
@@ -382,6 +391,8 @@ Status encode_secret_file_extn(const char *file_extn, EncodeInfo *encInfo)
             return e_failure;
         }
     }
+    printf("INFO: Encoding %s File Extension\n", encInfo->secret_fname);
+    printf("INFO: Done\n");
     return e_success;
 }
 
@@ -413,7 +424,8 @@ Status encode_secret_file_size(long file_size, EncodeInfo *encInfo)
         printf("ERROR: Unable to write 32 bytes to stego image\n");
         return e_failure;
     }
-
+    printf("INFO: Encoding %s File Size\n", encInfo->secret_fname);
+    printf("INFO: Done\n");
     return e_success;
 }
 
@@ -435,7 +447,7 @@ Status encode_secret_file_data(EncodeInfo *encInfo)
     fseek(secret_file, 0, SEEK_END);
     long size = ftell(secret_file);
     rewind(secret_file);
-   // printf("%d\n", size);
+    // printf("%d\n", size);
     encInfo->size_secret_file = size; // Set the correct file size
 
     // Read and encode the secret file data
@@ -461,6 +473,8 @@ Status encode_secret_file_data(EncodeInfo *encInfo)
             return e_failure;
         }
     }
+    printf("INFO: Encoding %s File Data\n", encInfo->secret_fname);
+    printf("INFO: Done\n");
 
     return e_success;
 }
@@ -485,5 +499,7 @@ Status copy_remaining_img_data(FILE *fptr_src, FILE *fptr_dest)
             return e_failure;
         }
     }
+    printf("INFO: Copying Left Over Data\n");
+    printf("INFO: Done\n");
     return e_success;
 }
