@@ -455,13 +455,13 @@ Status encode_secret_file_data(EncodeInfo *encInfo)
     FILE *stego_file = encInfo->fptr_stego_image; // Destination stego image file
     FILE *secret_file = encInfo->fptr_secret;     // Secret file containing the data to be encoded
     char secret_data;                             // Variable to hold each character of the secret file data
-    char image_buffer[8] = {0};                   // Buffer to hold 8 bytes of image data
-
+    char image_buffer[8] = {0};     // Buffer to hold 8 bytes of image data
+    rewind(secret_file);
     // Get the actual size of the secret file
     fseek(secret_file, 0, SEEK_END);
     long size = ftell(secret_file);   // Get the size of the secret file
     encInfo->size_secret_file = size; // Set the correct file size in EncodeInfo structure
-
+    rewind(secret_file);
     // Read and encode the secret file data
     for (int i = 0; i < size; i++)
     {
