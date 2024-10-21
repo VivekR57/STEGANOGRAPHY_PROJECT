@@ -83,7 +83,7 @@ Status read_and_validate_encode_args(int argc, char *argv[], EncodeInfo *encInfo
         }
         else
         {
-            printf("ERROR: Stego image file must have a .bmp extension.\n");
+            printf("Encoding: ./lsb_steg -e <.bmp file> <.txt file> [output file]\n");
             return e_failure;
         }
     }
