@@ -1,0 +1,39 @@
+NAME: Vivek.R
+Description: 
+Encoding :
+The encoding functionality embeds secret data (file content and metadata) into a BMP image using 
+Least Significant Bit (LSB) steganography. It encodes a magic string, file extension, file size, and 
+the actual secret data into the image, modifying the least significant bits of the image pixels 
+to conceal the information while preserving the image's appearance.
+
+Decoding:
+The decoding functionality extracts hidden data from a BMP image encoded with Least Significant
+Bit (LSB) steganography. It verifies the integrity of the decoded data by checking a magic string and
+retrieves the file extension, file size, and actual content of the hidden file.
+
+Sample Input : Encoding  ./a.out -e beautiful.bmp secret_file.txt  stego_image.bmp
+               Decoding   ./a.out -d stego_image.bmp output_file
+
+Sample Output :
+    Encoding:
+        INFO: Encoding Magic String Signature
+        INFO: Done
+        INFO: Encoding <file_extension> File Size
+        INFO: Done
+        INFO: Encoding <file_extension> File Data
+        INFO: Done
+        INFO: Copying Left Over Data
+        INFO: Done
+
+    Decoding:
+        INFO: ## Decoding Procedure Started ##
+        INFO: Opening required files
+        INFO: Opened stego_image.bmp
+        Enter the magic string to decode:
+        #*
+        INFO: Decoding Magic String Signature
+        INFO: Done
+        INFO: Decoding <file_extension> File Size
+        INFO: Done
+        INFO: Decoding <file_extension> File Data
+        INFO: Done
