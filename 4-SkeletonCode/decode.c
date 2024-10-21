@@ -7,26 +7,45 @@ Status read_and_validate_decode_args(int argc, char *argv[], DecodeInfo *decInfo
 {
     if (argc < 3 || argc > 4)
     {
-        printf("  Encoding: ./lsb_steg -e <.bmp file> <.txt file> [output file]\n");
-        printf("  Decoding: ./lsb_steg -d <.bmp file> [output file]\n");
+        printf("Decoding: ./lsb_steg -d <.bmp file> [output file]\n");
         return e_failure;
     }
 
-    if (strstr(argv[2], ".bmp") == NULL)
+    char *str = strstr(argv[2], ".bmp");
+    if (str != NULL && strcmp(str, ".bmp") == 0)
+    {
+        decInfo->stego_image_fname1 = argv[2];
+    }
+    else
     {
         printf("ERROR: Source image file must have a .bmp extension.\n");
         return e_failure;
     }
-    decInfo->stego_image_fname1 = argv[2];
+
+    // Handle optional output file name
     if (argc == 4)
     {
-        decInfo->output_fname = argv[3];
+        if (strchr(argv[3], '.') != NULL)
+        {
+            // If there is a dot, assume it's a valid extension and use it as is
+            strcpy(decInfo->output_fname, argv[3]);
+        }
+        else
+        {
+            // If no extension is provided, add default extension which will be later replaced by actual extension
+            strcpy(decInfo->output_fname, argv[3]);
+        }
     }
     else
     {
-        decInfo->output_fname = "output.txt";
+        strcpy(decInfo->output_fname, "output"); // Do not set .txt as default extension
+        printf("No output file provided. Using default: %s\n", decInfo->output_fname);
     }
+
+    printf("Output file name: %s\n", decInfo->output_fname);
+    return e_success;
 }
+
 Status do_decoding(DecodeInfo *decInfo)
 {
     printf("INFO: ## Decoding Procedure Started ##\n");
@@ -67,7 +86,7 @@ Status open_files_for_decode(DecodeInfo *decInfo)
         printf("ERROR : unable to open the stego image\n");
         return e_failure;
     }
-    fseek(decInfo->fptr_stego_image, 54, SEEK_SET);
+    fseek(decInfo->fptr_stego_image, 54, SEEK_SET);// Skip BMP header
     printf("INFO: Opening required files\n");
     printf("INFO: Opened %s\n", decInfo->stego_image_fname1);
     return e_success;
@@ -76,7 +95,7 @@ Status decode_magic_string(DecodeInfo *decInfo)
 {
     char magic_string[3];
     char image_buffer[8] = {0};
-    char decoded_magic_string[3] = {0};
+    char decoded_magic_string[3];
 
     printf("Enter the magic string to decode:\n");
     scanf("%s", magic_string);
@@ -147,7 +166,6 @@ Status decode_secret_file_extn(DecodeInfo *decInfo)
     int size = decInfo->length;
     char file_exten[20] = {0};
     char image_buffer[8] = {0};
-    char output_file_name[20] = "output";
 
     for (int i = 0; i < size; i++)
     {
@@ -158,16 +176,20 @@ Status decode_secret_file_extn(DecodeInfo *decInfo)
         }
         decode_lsb_to_byte(&file_exten[i], image_buffer);
     }
-
     file_exten[size] = '\0';
     strcpy(decInfo->extension, file_exten);
-    strcat(output_file_name, file_exten);
-    decInfo->fptr_output_file = fopen(output_file_name, "w");
+
+    // Append the extension to the output file name
+    strcat(decInfo->output_fname, file_exten);
+    printf("Output file with extension: %s\n", decInfo->output_fname);
+
+    decInfo->fptr_output_file = fopen(decInfo->output_fname, "w");
     if (decInfo->fptr_output_file == NULL)
     {
         printf("ERROR: Unable to open the output file\n");
         return e_failure;
     }
+
     printf("INFO: Opened %s\n", decInfo->output_fname); // For the output file
     printf("INFO: Done. Opened all required files\n");
     return e_success;
@@ -197,7 +219,6 @@ Status decode_secret_file_data(DecodeInfo *decInfo)
 
     char buffer[8];
     char ch;
-    //   printf("%d\n", decInfo->file_size);
     for (int i = 0; i < decInfo->file_size; i++)
     {
         if (fread(buffer, sizeof(char), 8, decInfo->fptr_stego_image) != 8)

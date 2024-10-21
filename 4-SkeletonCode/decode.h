@@ -12,7 +12,7 @@ typedef struct _DecodeInfo
     char extension[5];
     int length;
 
-    char *output_fname;
+    char output_fname[20];
     FILE *fptr_output_file;
 } DecodeInfo;
 

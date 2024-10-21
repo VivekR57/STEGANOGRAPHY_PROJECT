@@ -9,30 +9,35 @@ int main(int argc, char *argv[])
 {
     EncodeInfo encInfo;
     DecodeInfo decInfo;
-    if (check_operation_type(argv[1]) == e_encode)
+    if (argc > 1)
     {
-       // printf("User selected Encoding\n");
-        if (read_and_validate_encode_args(argc, argv, &encInfo) == e_failure)
+        if (check_operation_type(argv[1]) == e_encode)
         {
-            //printf("Argument validation failed. Exiting...\n");
-            return e_failure;
+            if (read_and_validate_encode_args(argc, argv, &encInfo) == e_failure)
+            {
+                return e_failure;
+            }
+            do_encoding(&encInfo);
         }
-        do_encoding(&encInfo);
-    }
-    else if (check_operation_type(argv[1]) == e_decode)
-    {
-      //  printf("User selected Decoding\n");
-        if (read_and_validate_decode_args(argc, argv, &decInfo) == e_failure)
+        else if (check_operation_type(argv[1]) == e_decode)
         {
-           // printf("Argument validation failed. Exiting...\n");
-            return e_failure;
-        } 
-        do_decoding(&decInfo);
+            if (read_and_validate_decode_args(argc, argv, &decInfo) == e_failure)
+            {
+                return e_failure;
+            }
+            do_decoding(&decInfo);
+        }
+        else
+        {
+            printf("Invalid input\n");
+        }
     }
     else
     {
-        printf("Invalid input\n");
+        printf("Encoding: ./lsb_steg -e <.bmp file> <.txt file> [output file]\n");
+        printf("Decoding: ./lsb_steg -d <.bmp file> [output file]\n");
     }
+
     return 0;
 }
 

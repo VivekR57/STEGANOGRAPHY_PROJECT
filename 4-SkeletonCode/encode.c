@@ -19,18 +19,12 @@ uint get_image_size_for_bmp(FILE *fptr_image)
 {
     uint width, height;
     // Seek to 18th byte
-    fseek(fptr_image, 18, SEEK_SET);
+    fseek(fptr_image, 18, SEEK_SET); // Go to width field
 
-    // Read the width (an int)
-    fread(&width, sizeof(int), 1, fptr_image);
-    // printf("width = %u\n", width);
+    fread(&width, sizeof(int), 1, fptr_image);  // Read width
+    fread(&height, sizeof(int), 1, fptr_image); // Read height
 
-    // Read the height (an int)
-    fread(&height, sizeof(int), 1, fptr_image);
-    // printf("height = %u\n", height);
-
-    // Return image capacity
-    return width * height * 3;
+    return width * height * 3; // Return image size (width * height * 3 bytes)
 }
 
 // Get image size
@@ -51,33 +45,47 @@ Status read_and_validate_encode_args(int argc, char *argv[], EncodeInfo *encInfo
         return e_failure;
     }
 
-    // Check if the source image file has a .bmp extension
-    if (strstr(argv[2], ".bmp") == NULL)
+    // Validate source image file (argv[2])
+    char *str = strstr(argv[2], ".bmp");
+    if (str != NULL && strcmp(str, ".bmp") == 0)
+    {
+        encInfo->src_image_fname = argv[2];
+    }
+    else
     {
         printf("ERROR: Source image file must have a .bmp extension.\n");
         return e_failure;
     }
 
-    // Check if the secret file has a dot in its name
-    if (strchr(argv[3], '.') == NULL)
+    // Check if the secret file (argv[3]) has a dot in its name
+    if (strchr(argv[3], '.') != NULL)
     {
-        printf("ERROR: Secret file must have a valid extension.\n");
-        return e_failure;
-    }
-
-    // Store values in the EncodeInfo structure
-    encInfo->src_image_fname = argv[2];
-    encInfo->secret_fname = argv[3];
-
-    // Check for optional stego image file
-    if (argc == 5 && strstr(argv[4], ".bmp") != NULL)
-    {
-
-        encInfo->stego_image_fname = argv[4];
+        encInfo->secret_fname = argv[3];
     }
     else
     {
-        encInfo->stego_image_fname = "stego_img.bmp"; // Default name if not provided
+        printf("Encoding: ./lsb_steg -e <.bmp file> <.txt file> [output file]\n");
+        return e_failure;
+    }
+
+    // Validate and store the stego image file (argv[4])
+    if (argc == 5)
+    {
+        char *str1 = strstr(argv[4], ".bmp");
+        if (str1 != NULL && strcmp(str1, ".bmp") == 0)
+        {
+            encInfo->stego_image_fname = argv[4];
+        }
+        else
+        {
+            printf("ERROR: Stego image file must have a .bmp extension.\n");
+            return e_failure;
+        }
+    }
+    else
+    {
+        encInfo->stego_image_fname = "stego_img.bmp";
+        printf("No stego image file provided. Using default: %s\n", encInfo->stego_image_fname);
     }
 
     return e_success;
